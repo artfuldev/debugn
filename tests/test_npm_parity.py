@@ -222,3 +222,41 @@ class TestNpmDebugParity(TestCase):
 
         sys.stderr = old_stderr
         sys.stdout = old_stdout
+
+    def test_timing_color_matches_namespace_npm_parity(self):
+        """Test that timing color matches namespace color like npm debug."""
+        old_stderr = sys.stderr
+        sys.stderr = StringIO()
+
+        with mock.patch.dict(os.environ, {'DEBUG': 'test', 'DEBUG_COLORS': '1'}):
+            # Create fresh debug instance to pick up DEBUG_COLORS
+            from debugn.core import Debug
+            global_debug = Debug()
+
+            # Mock the global _debug to use our fresh instance
+            with mock.patch('debugn.core._debug', global_debug):
+                log = debug('test')
+                log('message')
+
+                output = sys.stderr.getvalue()
+
+                # Should contain ANSI color codes
+                assert '\033[' in output
+
+                # Extract color codes - timing should match namespace
+                import re
+                color_matches = re.findall(r'\033\[(\d+)m', output)
+
+                # Should have namespace color and timing color
+                assert len(color_matches) >= 2
+
+                # First color (namespace) should match timing color
+                namespace_color = color_matches[0]
+                timing_color = color_matches[2] if len(color_matches) > 2 else None
+
+                assert namespace_color == timing_color, (
+                    f"Namespace color {namespace_color} should match "
+                    f"timing color {timing_color}"
+                )
+
+        sys.stderr = old_stderr

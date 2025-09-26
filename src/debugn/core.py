@@ -257,9 +257,11 @@ def debug(namespace: str) -> Debugger:
         color = _debug.get_color(namespace)
         use_colors = _debug.use_colors
 
-        if use_colors and sys.stderr.isatty():
-            # Colored output: namespace message +diff
-            output = f"\033[{color}m{namespace}\033[0m {msg} \033[90m+{diff}\033[0m"
+        if use_colors:
+            # Colored output: namespace message +diff (timing matches namespace color)
+            output = (
+                f"\033[{color}m{namespace}\033[0m {msg} \033[{color}m+{diff}\033[0m"
+            )
         else:
             # Non-TTY format: timestamp namespace message +diff
             if not _debug.hide_date:

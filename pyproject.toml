@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "debugn"
-version = "0.1.0"
+version = "0.1.1"
 description = "Node.js-style namespace debug logging for Python"
 authors = [
     { name = "Sudarsan Balaji", email = "hello@artful.dev" }
